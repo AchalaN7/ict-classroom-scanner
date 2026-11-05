@@ -1,11 +1,112 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>ICT Classroom Scanner</title>
+
+  <style>
+    body {
+      margin: 0;
+      padding: 30px 20px;
+      font-family: Arial, sans-serif;
+      background: #FAF9FC;
+      color: #393447;
+      text-align: center;
+    }
+
+    h1 {
+      color: #62567D;
+    }
+
+    button {
+      padding: 14px 24px;
+      border: none;
+      border-radius: 12px;
+      background: #62567D;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      margin: 8px;
+    }
+
+    video {
+      width: 100%;
+      max-width: 500px;
+      margin-top: 20px;
+      border-radius: 16px;
+      background: #222;
+    }
+
+    #status {
+      margin-top: 20px;
+      color: #62567D;
+    }
+  </style>
 </head>
+
 <body>
-  <h1>ICT Classroom QR Scanner</h1>
-  <p>Our scanner is getting ready! 🎉</p>
+
+  <h1>ICT Classroom</h1>
+  <h2>Camera Test</h2>
+
+  <p>Let's test our camera access!</p>
+
+  <button onclick="startCamera()">Open Camera</button>
+  <button onclick="stopCamera()">Stop Camera</button>
+
+  <br>
+
+  <video id="camera" autoplay playsinline muted></video>
+
+  <p id="status">Camera is not running.</p>
+
+  <script>
+    let cameraStream = null;
+
+    async function startCamera() {
+      const video = document.getElementById('camera');
+      const status = document.getElementById('status');
+
+      status.textContent = 'Requesting camera permission...';
+
+      try {
+        if (!navigator.mediaDevices ||
+            !navigator.mediaDevices.getUserMedia) {
+          throw new Error('Camera access is not supported in this browser context.');
+        }
+
+        cameraStream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: { ideal: 'environment' }
+          },
+          audio: false
+        });
+
+        video.srcObject = cameraStream;
+        await video.play();
+
+        status.textContent = 'Camera is working! 🎉';
+
+      } catch (error) {
+        console.error('Camera error:', error);
+
+        status.textContent =
+          'Camera error: ' + error.name + ' — ' + error.message;
+      }
+    }
+
+    function stopCamera() {
+      if (cameraStream) {
+        cameraStream.getTracks().forEach(track => track.stop());
+        cameraStream = null;
+      }
+
+      document.getElementById('camera').srcObject = null;
+      document.getElementById('status').textContent =
+        'Camera stopped.';
+    }
+  </script>
+
 </body>
 </html>
