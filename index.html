@@ -59,12 +59,20 @@
       color: var(--lavender);
     }
 
+    .header-text {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    
+    .header-text h1 {
+      margin-bottom: 0;
+    }
+    
     .current-date {
-      color: #62567D;
-      font-family: inherit;
-      font-size: 14px;
       margin-top: 6px;
-      margin-bottom: 24px;
+      color: #62567D;
+      font-size: 14px;
     }
 
     .section-label {
@@ -263,9 +271,12 @@
 
     <!-- Header -->
     <header class="header">
-      <img src="https://drive.google.com/uc?export=view&id=19yh0WIv-i0xj81-g0_8_BqYSX75diPxF" alt="ICT Classroom Owl Logo">
-      <h1>Take Attendance</h1>
-      <p id="currentDate" class="current-date"></p>
+      <img src="https://drive.google.com/file/d/19yh0WIv-i0xj81-g0_8_BqYSX75diPxF/view" alt="ICT Classroom Owl Logo">
+    
+      <div class="header-text">
+        <h1>Take Attendance</h1>
+        <p id="currentDate" class="current-date"></p>
+      </div>
     </header>
 
     <!-- Group Selection -->
