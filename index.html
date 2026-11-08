@@ -249,6 +249,10 @@
       filter: brightness(0.92);
     }
 
+    .warning {
+      color: #EF0000;
+    }
+
     @media (max-width: 360px) {
       body {
         padding: 22px 13px;
@@ -271,7 +275,7 @@
 
     <!-- Header -->
     <header class="header">
-      <img src="https://drive.google.com/file/d/19yh0WIv-i0xj81-g0_8_BqYSX75diPxF/view" alt="ICT Classroom Owl Logo">
+      <img src="./Logo.png" alt="ICT Classroom Owl Logo">
     
       <div class="header-text">
         <h1>Take Attendance</h1>
@@ -416,6 +420,7 @@
 
       if (!document.getElementById('groupSelect').value) {
         statusText.textContent = 'Please select a group first.';
+        statusText.classList.add('warning');
         return;
       }
 
