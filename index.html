@@ -1,111 +1,529 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>ICT Classroom Scanner</title>
+  <title>Take Attendance | ICT Classroom</title>
 
   <style>
+    :root {
+      --lavender: #62567D;
+      --background: #FAF9FC;
+      --text: #393447;
+      --secondary: #898493;
+      --green: #39845A;
+      --green-bg: #E2F3E8;
+      --blue: #5278B5;
+      --blue-bg: #E8EFFB;
+      --amber: #A77A32;
+      --amber-bg: #FFF2D9;
+      --red: #C66C70;
+      --red-bg: #FBE9E9;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
-      padding: 30px 20px;
-      font-family: Arial, sans-serif;
-      background: #FAF9FC;
-      color: #393447;
-      text-align: center;
+      padding: 28px 18px;
+      font-family: "Nunito", "Trebuchet MS", Arial, sans-serif;
+      background: var(--background);
+      color: var(--text);
     }
 
-    h1 {
-      color: #62567D;
+    .app {
+      width: 100%;
+      max-width: 520px;
+      margin: 0 auto;
     }
 
-    button {
-      padding: 14px 24px;
-      border: none;
-      border-radius: 12px;
-      background: #62567D;
-      color: white;
-      font-size: 16px;
-      cursor: pointer;
-      margin: 8px;
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 30px;
+    }
+
+    .header img {
+      width: 55px;
+      height: 55px;
+      object-fit: contain;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 23px;
+      font-weight: 800;
+      color: var(--lavender);
+    }
+
+    .section-label {
+      display: block;
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .group-select {
+      width: 100%;
+      padding: 15px;
+      border: 1px solid #E8E4EF;
+      border-radius: 13px;
+      background: white;
+      color: var(--text);
+      font-size: 15px;
+      font-family: inherit;
+      outline: none;
+      margin-bottom: 24px;
+    }
+
+    .group-select:focus-visible,
+    button:focus-visible {
+      outline: 3px solid #B9A9DE;
+      outline-offset: 3px;
+    }
+
+    .camera-section {
+      margin-bottom: 20px;
+    }
+
+    .camera-frame {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      overflow: hidden;
+      border-radius: 18px;
+      background: #EAE7F0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     video {
+      display: none;
       width: 100%;
-      max-width: 500px;
-      margin-top: 20px;
-      border-radius: 16px;
-      background: #222;
+      height: 100%;
+      object-fit: cover;
     }
 
-    #status {
-      margin-top: 20px;
-      color: #62567D;
+    .camera-placeholder {
+      text-align: center;
+      padding: 20px;
+      color: var(--secondary);
+    }
+
+    .camera-placeholder svg {
+      width: 48px;
+      height: 48px;
+      margin-bottom: 12px;
+      color: var(--lavender);
+    }
+
+    .camera-placeholder p {
+      margin: 0;
+      font-size: 14px;
+    }
+
+    .status {
+      min-height: 22px;
+      margin: 12px 0 0;
+      text-align: center;
+      font-size: 13px;
+      color: var(--secondary);
+    }
+
+    .counters {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin: 22px 0;
+    }
+
+    .counter {
+      padding: 16px;
+      border-radius: 15px;
+    }
+
+    .counter-number {
+      display: block;
+      font-size: 29px;
+      font-weight: 800;
+      margin-bottom: 3px;
+    }
+
+    .counter-label {
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .scanned {
+      background: var(--green-bg);
+      color: var(--green);
+    }
+
+    .not-scanned {
+      background: var(--red-bg);
+      color: var(--red);
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .control-button {
+      aspect-ratio: 1 / 1;
+      border: none;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform 0.12s ease, background 0.12s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .control-button svg {
+      width: 27px;
+      height: 27px;
+      stroke: currentColor;
+      stroke-width: 2;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .control-button:active:not(:disabled) {
+      transform: scale(0.94);
+      filter: brightness(0.91);
+    }
+
+    .control-button:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .start-button {
+      background: var(--green-bg);
+      color: var(--green);
+    }
+
+    .scan-button {
+      background: var(--blue-bg);
+      color: var(--blue);
+    }
+
+    .pause-button {
+      background: var(--amber-bg);
+      color: var(--amber);
+    }
+
+    .stop-button {
+      background: var(--red-bg);
+      color: var(--red);
+    }
+
+    .control-button.active {
+      box-shadow: inset 0 0 0 2px currentColor;
+      filter: brightness(0.92);
+    }
+
+    @media (max-width: 360px) {
+      body {
+        padding: 22px 13px;
+      }
+
+      .controls {
+        gap: 8px;
+      }
+
+      .control-button {
+        border-radius: 13px;
+      }
     }
   </style>
 </head>
 
 <body>
 
-  <h1>ICT Classroom</h1>
-  <h2>Camera Test</h2>
+  <main class="app">
 
-  <p>Let's test our camera access!!</p>
+    <!-- Header -->
+    <header class="header">
+      <img
+        src="https://drive.google.com/thumbnail?id=19yh0WIv-i0xj81-g0_8_BqYSX75diPxF&sz=w500"
+        alt="ICT Classroom Owl Logo">
+      <h1>Take Attendance</h1>
+    </header>
 
-  <button onclick="startCamera()">Open Camera</button>
-  <button onclick="stopCamera()">Stop Camera</button>
+    <!-- Group Selection -->
+    <label class="section-label" for="groupSelect">
+      Select Group
+    </label>
 
-  <br>
+    <select id="groupSelect" class="group-select">
+      <option value="">Choose a group</option>
+      <option value="2028G1">Group 1</option>
+      <option value="2028G2">Group 2</option>
+      <option value="2028G3">Group 3</option>
+    </select>
 
-  <video id="camera" autoplay playsinline muted></video>
+    <!-- Camera -->
+    <section class="camera-section">
+      <span class="section-label">Camera</span>
 
-  <p id="status">Camera is not running.</p>
+      <div class="camera-frame">
+
+        <video id="camera" autoplay playsinline muted></video>
+
+        <div id="cameraPlaceholder" class="camera-placeholder">
+          <svg viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="1.6"
+               stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 7h3l2-3h6l2 3h3a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2Z"/>
+            <circle cx="12" cy="13" r="4"/>
+          </svg>
+          <p>Your camera preview will appear here</p>
+        </div>
+
+      </div>
+
+      <p id="status" class="status">
+        Select a group to begin.
+      </p>
+    </section>
+
+    <!-- Attendance Counters -->
+    <section class="counters">
+
+      <div class="counter scanned">
+        <span id="scannedCount" class="counter-number">0</span>
+        <span class="counter-label">Scanned</span>
+      </div>
+
+      <div class="counter not-scanned">
+        <span id="notScannedCount" class="counter-number">0</span>
+        <span class="counter-label">Not Scanned</span>
+      </div>
+
+    </section>
+
+    <!-- Controls -->
+    <section class="controls">
+
+      <button
+        id="startButton"
+        class="control-button start-button"
+        aria-label="Start attendance session"
+        title="Start"
+        onclick="startSession()">
+
+        <svg viewBox="0 0 24 24">
+          <path d="m7 4 13 8-13 8V4Z"/>
+        </svg>
+      </button>
+
+      <button
+        id="scanButton"
+        class="control-button scan-button"
+        aria-label="Start or resume scanning"
+        title="Scan"
+        onclick="startScanning()"
+        disabled>
+
+        <svg viewBox="0 0 24 24">
+          <path d="M4 8V5a1 1 0 0 1 1-1h3"/>
+          <path d="M16 4h3a1 1 0 0 1 1 1v3"/>
+          <path d="M20 16v3a1 1 0 0 1-1 1h-3"/>
+          <path d="M8 20H5a1 1 0 0 1-1-1v-3"/>
+          <path d="M9 9h6v6H9z"/>
+        </svg>
+      </button>
+
+      <button
+        id="pauseButton"
+        class="control-button pause-button"
+        aria-label="Pause scanning"
+        title="Pause"
+        onclick="pauseScanning()"
+        disabled>
+
+        <svg viewBox="0 0 24 24">
+          <path d="M8 5v14"/>
+          <path d="M16 5v14"/>
+        </svg>
+      </button>
+
+      <button
+        id="stopButton"
+        class="control-button stop-button"
+        aria-label="Stop attendance session"
+        title="Stop"
+        onclick="stopSession()"
+        disabled>
+
+        <svg viewBox="0 0 24 24">
+          <rect x="6" y="6" width="12" height="12" rx="1"/>
+        </svg>
+      </button>
+
+    </section>
+
+  </main>
 
   <script>
     let cameraStream = null;
+    let sessionStarted = false;
+    let scanning = false;
+    let sessionStartTime = null;
 
-    async function startCamera() {
-      const video = document.getElementById('camera');
-      const status = document.getElementById('status');
+    const video = document.getElementById('camera');
+    const placeholder = document.getElementById('cameraPlaceholder');
+    const statusText = document.getElementById('status');
 
-      status.textContent = 'Requesting camera permission...';
+    const startButton = document.getElementById('startButton');
+    const scanButton = document.getElementById('scanButton');
+    const pauseButton = document.getElementById('pauseButton');
+    const stopButton = document.getElementById('stopButton');
+
+    // Start the attendance session
+    function startSession() {
+
+      if (sessionStarted) return;
+
+      if (!document.getElementById('groupSelect').value) {
+        statusText.textContent = 'Please select a group first.';
+        return;
+      }
+
+      sessionStarted = true;
+      sessionStartTime = new Date();
+
+      startButton.classList.add('active');
+      startButton.disabled = true;
+
+      scanButton.disabled = false;
+      pauseButton.disabled = false;
+      stopButton.disabled = false;
+
+      statusText.textContent = 'Attendance session started.';
+    }
+
+    // Open the camera or resume a paused camera
+    async function startScanning() {
+
+      if (!sessionStarted || scanning) return;
 
       try {
-        if (!navigator.mediaDevices ||
-            !navigator.mediaDevices.getUserMedia) {
-          throw new Error('Camera access is not supported in this browser context.');
+
+        if (!cameraStream) {
+
+          statusText.textContent = 'Requesting camera permission...';
+
+          if (!navigator.mediaDevices ||
+              !navigator.mediaDevices.getUserMedia) {
+            throw new Error('Camera access is not supported.');
+          }
+
+          cameraStream = await navigator.mediaDevices.getUserMedia({
+            video: {
+              facingMode: { ideal: 'environment' }
+            },
+            audio: false
+          });
+
+          video.srcObject = cameraStream;
+        } else {
+          cameraStream.getVideoTracks().forEach(track => {
+            track.enabled = true;
+          });
         }
 
-        cameraStream = await navigator.mediaDevices.getUserMedia({
-          video: {
-            facingMode: { ideal: 'environment' }
-          },
-          audio: false
-        });
-
-        video.srcObject = cameraStream;
         await video.play();
 
-        status.textContent = 'Camera is working! 🎉';
+        scanning = true;
+        video.style.display = 'block';
+        placeholder.style.display = 'none';
+
+        scanButton.classList.add('active');
+        pauseButton.classList.remove('active');
+
+        statusText.textContent = 'Camera is running.';
 
       } catch (error) {
+
         console.error('Camera error:', error);
 
-        status.textContent =
-          'Camera error: ' + error.name + ' — ' + error.message;
+        statusText.textContent =
+          'Camera error: ' + error.message;
       }
     }
 
+    // Pause scanning without ending the session
+    function pauseScanning() {
+
+      if (!sessionStarted || !scanning) return;
+
+      if (cameraStream) {
+        cameraStream.getVideoTracks().forEach(track => {
+          track.enabled = false;
+        });
+      }
+
+      scanning = false;
+
+      scanButton.classList.remove('active');
+      pauseButton.classList.add('active');
+
+      statusText.textContent = 'Scanning paused.';
+    }
+
+    // Stop the session and release the camera
+    function stopSession() {
+
+      if (!sessionStarted) return;
+
+      stopCamera();
+
+      sessionStarted = false;
+      scanning = false;
+      sessionStartTime = null;
+
+      startButton.classList.remove('active');
+      startButton.disabled = false;
+
+      scanButton.classList.remove('active');
+      pauseButton.classList.remove('active');
+
+      scanButton.disabled = true;
+      pauseButton.disabled = true;
+      stopButton.disabled = true;
+
+      statusText.textContent = 'Attendance session ended.';
+    }
+
+    // Release camera resources
     function stopCamera() {
+
       if (cameraStream) {
         cameraStream.getTracks().forEach(track => track.stop());
         cameraStream = null;
       }
 
-      document.getElementById('camera').srcObject = null;
-      document.getElementById('status').textContent =
-        'Camera stopped.';
+      video.srcObject = null;
+      video.style.display = 'none';
+      placeholder.style.display = 'block';
     }
+
+    // Release camera if the page is closed
+    window.addEventListener('pagehide', stopCamera);
+
   </script>
 
 </body>
