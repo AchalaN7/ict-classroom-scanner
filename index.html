@@ -47,8 +47,8 @@
     }
 
     .header img {
-      width: 55px;
-      height: 55px;
+      width: 65px;
+      height: 65px;
       object-fit: contain;
     }
 
@@ -421,6 +421,11 @@
       if (!document.getElementById('groupSelect').value) {
         statusText.textContent = 'Please select a group first.';
         statusText.classList.add('warning');
+      
+        setTimeout(() => {
+          statusText.classList.remove('warning');
+        }, 2500);
+      
         return;
       }
 
